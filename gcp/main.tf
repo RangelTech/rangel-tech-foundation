@@ -15,6 +15,7 @@ locals {
     "monitoring.googleapis.com",
     "pubsub.googleapis.com",
     "run.googleapis.com",
+    "secretmanager.googleapis.com",
     "serviceusage.googleapis.com",
     "storage.googleapis.com",
   ])
