@@ -6,6 +6,11 @@ terraform {
       version = "~> 6.0"
     }
   }
+
+  backend "gcs" {
+    bucket = "rangel-tech-tfstate"
+    prefix = "foundation-github"
+  }
 }
 
 provider "github" { owner = var.github_org }

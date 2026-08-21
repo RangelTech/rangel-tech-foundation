@@ -11,6 +11,11 @@ terraform {
       version = "~> 6.0"
     }
   }
+
+  backend "gcs" {
+    bucket = "rangel-tech-tfstate"
+    prefix = "foundation-gcp"
+  }
 }
 
 provider "google" {
