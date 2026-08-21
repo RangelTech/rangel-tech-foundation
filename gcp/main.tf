@@ -130,6 +130,17 @@ resource "google_service_account_iam_member" "github_deployer" {
   member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository_owner/${var.github_org}"
 }
 
+# Achado real (21/08, migração do kernel-llm pro projeto certo): `gcloud run
+# deploy` sem `--service-account` roda a revisão como a SA padrão de compute
+# do projeto — o `github-deployer` precisa de `iam.serviceAccountUser` nela
+# pra ter permissão de "atuar como", senão o deploy do CI falha com
+# permissão negada mesmo tendo `roles/run.admin` no projeto.
+resource "google_service_account_iam_member" "github_deployer_actas_default_compute" {
+  service_account_id = "projects/${var.project_id}/serviceAccounts/${data.google_project.current.number}-compute@developer.gserviceaccount.com"
+  role                = "roles/iam.serviceAccountUser"
+  member              = "serviceAccount:${google_service_account.github_deployer.email}"
+}
+
 resource "google_service_account" "billing_blackout" {
   account_id   = "billing-blackout"
   display_name = "Disables project billing at the configured budget ceiling"
