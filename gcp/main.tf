@@ -158,16 +158,22 @@ resource "google_monitoring_notification_channel" "billing_email" {
 
 resource "google_billing_budget" "monthly" {
   billing_account = var.billing_account_id
-  display_name    = "Rangel Tech monthly USD 100 ceiling"
+  display_name    = "Rangel Tech monthly ~USD 100 ceiling (${var.budget_amount_brl} BRL)"
 
   budget_filter {
     projects = ["projects/${data.google_project.current.number}"]
   }
 
+  # Achado real na aplicação: a Billing Budgets API exige o valor na mesma
+  # moeda da conta de billing (`gcloud billing accounts describe` confirma
+  # currencyCode: BRL pra esta conta) — mandar USD dá 400 genérico, sem
+  # detalhe no erro. O teto de US$100/mês (infra-01 seção 8g) vira BRL aqui;
+  # `var.budget_amount_brl` é a conversão aproximada — câmbio muda, revisar
+  # esse número de vez em quando, não é um valor fixo pra sempre.
   amount {
     specified_amount {
-      currency_code = "USD"
-      units         = "100"
+      currency_code = "BRL"
+      units         = var.budget_amount_brl
     }
   }
 
@@ -192,9 +198,28 @@ resource "google_billing_budget" "monthly" {
   }
 
   all_updates_rule {
-    pubsub_topic                     = google_pubsub_topic.budget_alerts.id
-    monitoring_notification_channels = [google_monitoring_notification_channel.billing_email.name]
-    disable_default_iam_recipients   = true
+    # Mesmo achado do notification channel logo abaixo: a API de Billing
+    # Budgets exige número do projeto no tópico Pub/Sub também, não o ID
+    # (google_pubsub_topic.id vem como "projects/<ID>/topics/<nome>").
+    pubsub_topic = replace(
+      google_pubsub_topic.budget_alerts.id,
+      "projects/${var.project_id}/",
+      "projects/${data.google_project.current.number}/"
+    )
+    # A API de Billing Budgets exige número do projeto aqui, não o ID —
+    # achado real (a criação falhava com 400 genérico, sem detalhe; só
+    # apareceu comparando com budget_filter.projects, que já usa número).
+    # google_monitoring_notification_channel.billing_email.name vem no
+    # formato "projects/<ID>/notificationChannels/<num>" (usa ID por padrão
+    # na API do Monitoring) — troca só o segmento do projeto pelo número.
+    monitoring_notification_channels = [
+      replace(
+        google_monitoring_notification_channel.billing_email.name,
+        "projects/${var.project_id}/",
+        "projects/${data.google_project.current.number}/"
+      )
+    ]
+    disable_default_iam_recipients = true
   }
 }
 
