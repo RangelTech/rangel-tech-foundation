@@ -1,3 +1,37 @@
+<!-- readme-padrao -->
+# Fundação Rangel Tech (Terraform)
+
+> Terraform da fundação compartilhada: pasta `gcp/` (aplicada antes dos serviços) e `github/` (configuração comum da organização; login do GitHub Actions no GCP sem chave estática).
+
+![Página do repositório](docs/img/principal.webp)
+
+## O que é
+Terraform da fundação compartilhada: pasta `gcp/` (aplicada antes dos serviços) e `github/` (configuração comum da organização; login do GitHub Actions no GCP sem chave estática).
+
+Estado: **infraestrutura como código (aplicada à mão, com revisão)**.
+
+## Onde está no ar
+- Sem endereço público próprio.
+
+## Onde faz o deploy
+Não tem deploy na VPS principal (infraestrutura como código (aplicada à mão, com revisão)).
+
+## Como funciona por dentro
+Resumo acima; os detalhes estão nas notas técnicas (README anterior) abaixo e na spec 57.
+
+## Segredos
+Nenhum valor de segredo fica neste repositório. Os segredos dos serviços ficam no Infisical (mapa em `vps_rt_infra/scripts/infisical/mapa_envs.json`) e chegam à VPS gerados no deploy.
+
+## Rodar e testar localmente
+Ver as notas técnicas abaixo (cada repositório tem o seu jeito); os testes de QA em produção são por cliques reais, com evidência em `new_ragente/qa/evidencias`.
+
+## Links
+- Repositório: https://github.com/RangelTech/rangel-tech-foundation
+- Painel único: https://painel.rangeltech.net
+- Spec de organização geral: `new_ragente/specs/57_ORGANIZACAO_GERAL_PRODUTOS_E_PAINEL.md`
+
+## Notas técnicas (README anterior)
+
 # Rangel Tech Foundation
 
 Terraform da fundacao compartilhada da Rangel Tech. A pasta `gcp/` e aplicada
